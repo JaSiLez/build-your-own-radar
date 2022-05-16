@@ -1,0 +1,12 @@
+name: Release Drafter & Autolabeler
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - development
+
+jobs:
+  release-drafter:
+    uses: pagonxt/workflows/.github/workflows/release-drafter-v1.yml@main

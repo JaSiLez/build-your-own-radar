@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - development
+  push:
+    branches:
+      - development
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+
+  ci:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    name: Node.js CI
+    uses: pagonxt/workflows/.github/workflows/nodejs-v1.yml@merchant
+    with:
+      node_version: 16.x
+      artifact_name: distribution
+      artifact_paths: |
+        app/**/*
+        coverage
+    secrets:
+      sonar_token: ${{ secrets.SONAR_TOKEN }}

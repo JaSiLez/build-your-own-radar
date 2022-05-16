@@ -175,6 +175,35 @@ const CSVDocument = function (url) {
   return self
 }
 
+const CSVLocalDocument = function (url) {
+  var self = {}
+
+  self.build = function () {
+    d3.csv("_data/radar.csv").then(createBlips)
+  }
+
+  var createBlips = function (data) {
+    try {
+      var columnNames = data.columns
+      delete data.columns
+      var contentValidator = new ContentValidator(columnNames)
+      contentValidator.verifyContent()
+      contentValidator.verifyHeaders()
+      var blips = _.map(data, new InputSanitizer().sanitize)
+      plotRadar(FileName(url), blips, 'CSV File', [])
+    } catch (exception) {
+      plotErrorMessage(exception)
+    }
+  }
+
+  self.init = function () {
+    plotLoading()
+    return self
+  }
+
+  return self
+}
+
 const JSONFile = function (url) {
   var self = {}
 
@@ -217,6 +246,21 @@ const FileName = function (url) {
     return str
   }
   return url
+}
+
+const LocalCSVInput = function () {
+  var self = {}
+  var sheet
+
+  self.build = function () {
+    var domainName = DomainName(window.location.search.substring(1))
+    //var queryString = window.location.href.match(/sheetId(.*)/)
+    //var queryParams = queryString ? QueryParams(queryString[0]) : {}
+
+    sheet = CSVLocalDocument()
+    sheet.init().build()
+  }
+  return self
 }
 
 const GoogleSheetInput = function () {
@@ -407,3 +451,4 @@ function plotUnauthorizedErrorMessage() {
 }
 
 module.exports = GoogleSheetInput
+module.exports = LocalCSVInput
